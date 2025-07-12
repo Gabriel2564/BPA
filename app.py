@@ -36,7 +36,7 @@ y = df['valor']  # Variable objetivo (valor del mercado del jugador)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Crear y entrenar el modelo de Árbol de Decisión con profundidad limitada
-dt_model = DecisionTreeClassifier(max_depth=10, random_state=42)  # Limitar la profundidad para optimizar el uso de memoria
+dt_model = DecisionTreeClassifier(max_depth=7, random_state=42)  # Limitar la profundidad para optimizar el uso de memoria
 dt_model.fit(X_train, y_train)
 
 # Realizar predicciones y evaluar el modelo
@@ -50,7 +50,7 @@ st.write(confusion_matrix(y_test, y_pred_dt))
 
 ## 4.1.2 Random Forest
 # Crear y entrenar el modelo de Random Forest con menos árboles para optimizar memoria
-rf_model = RandomForestClassifier(n_estimators=200, random_state=42)  # Reducir número de árboles
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)  # Reducir número de árboles
 rf_model.fit(X_train, y_train)
 
 # Realizar predicciones y evaluar el modelo

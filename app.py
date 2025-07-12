@@ -21,6 +21,9 @@ df = pd.read_excel(file_url)
 # Si el dataset es muy grande, tomar una muestra aleatoria (10%)
 df = df.sample(frac=0.1, random_state=42)
 
+# Restablecer el índice
+df = df.reset_index(drop=True)
+
 # Mostrar las primeras filas del archivo
 st.write("Vista previa de los datos:")
 st.write(df.head())

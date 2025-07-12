@@ -44,9 +44,14 @@ X_scaled = scaler.fit_transform(X)
 # Dividir el conjunto de datos entre entrenamiento y prueba
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-# Manejo de desbalanceo de clases con SMOTE
-smote = SMOTE(random_state=42)
-X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
+# Comprobar si hay más de una clase en y_train
+if len(np.unique(y_train)) > 1:
+    smote = SMOTE(random_state=42)
+    X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
+    st.write("SMOTE aplicado.")
+else:
+    X_train_res, y_train_res = X_train, y_train
+    st.write("SMOTE no aplicado, solo una clase en el entrenamiento.")
 
 # Crear y entrenar el modelo de Árbol de Decisión con profundidad limitada
 dt_model = DecisionTreeClassifier(max_depth=10, random_state=42)  # Aumentar la profundidad para capturar más complejidad

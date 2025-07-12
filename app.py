@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectFromModel
+from imblearn.over_sampling import SMOTE  # Para manejar clases desbalanceadas
 
 # Título de la aplicación
 st.title('Análisis de Jugadores de Fútbol')
@@ -43,9 +44,13 @@ X_scaled = scaler.fit_transform(X)
 # Dividir el conjunto de datos entre entrenamiento y prueba
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
+# Manejo de desbalanceo de clases con SMOTE
+smote = SMOTE(random_state=42)
+X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
+
 # Crear y entrenar el modelo de Árbol de Decisión con profundidad limitada
-dt_model = DecisionTreeClassifier(max_depth=5, random_state=42)  # Limitar la profundidad para optimizar el uso de memoria
-dt_model.fit(X_train, y_train)
+dt_model = DecisionTreeClassifier(max_depth=10, random_state=42)  # Aumentar la profundidad para capturar más complejidad
+dt_model.fit(X_train_res, y_train_res)
 
 # Realizar predicciones y evaluar el modelo
 y_pred_dt = dt_model.predict(X_test)
@@ -57,9 +62,9 @@ st.write("Matriz de Confusión (Árbol de Decisión):")
 st.write(confusion_matrix(y_test, y_pred_dt))
 
 ## 4.1.2 Random Forest
-# Crear y entrenar el modelo de Random Forest con menos árboles para optimizar memoria
-rf_model = RandomForestClassifier(n_estimators=50, random_state=42)  # Reducir número de árboles
-rf_model.fit(X_train, y_train)
+# Crear y entrenar el modelo de Random Forest con más árboles
+rf_model = RandomForestClassifier(n_estimators=200, random_state=42, class_weight='balanced')  # Aumentar número de árboles
+rf_model.fit(X_train_res, y_train_res)
 
 # Realizar predicciones y evaluar el modelo
 y_pred_rf = rf_model.predict(X_test)
@@ -86,7 +91,7 @@ X_train_selected = sfm.transform(X_train)
 X_test_selected = sfm.transform(X_test)
 
 # Re-entrenar el modelo de Random Forest con las características seleccionadas
-rf_model_selected = RandomForestClassifier(n_estimators=50, random_state=42)  # Reducir el número de árboles
+rf_model_selected = RandomForestClassifier(n_estimators=200, random_state=42, class_weight='balanced')  # Reducir el número de árboles
 rf_model_selected.fit(X_train_selected, y_train)
 
 # Evaluar el modelo con características seleccionadas

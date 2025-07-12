@@ -95,13 +95,17 @@ st.write(confusion_matrix(y_test, y_pred_selected))
 
 # Comparación de jugadores (Función de recomendación)
 st.write("Comparar dos jugadores:")
+
+# Cambié la entrada a nombre del jugador
 player1_name = st.text_input('Ingrese el nombre del primer jugador')
 player2_name = st.text_input('Ingrese el nombre del segundo jugador')
 
 def compare_players(player1_name, player2_name, dataframe):
+    # Buscar los jugadores por nombre
     player1_features = dataframe[dataframe['jugador'] == player1_name]
     player2_features = dataframe[dataframe['jugador'] == player2_name]
     
+    # Verificar si ambos jugadores existen
     if player1_features.empty or player2_features.empty:
         return "Uno o ambos jugadores no se encuentran en el conjunto de datos."
     

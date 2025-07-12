@@ -32,7 +32,12 @@ st.write(df.head())
 
 ## 4.1.1 Árbol de Decisión
 # Configuración del modelo de Árbol de Decisión
-X = df[['goles', 'asistencias', 'edad', 'altura', 'rating', 'posición auxiliar']]  # Variables predictoras
+#X = df[['goles', 'asistencias', 'edad', 'altura', 'rating', 'posición auxiliar']]  # Variables predictoras
+#y = df['valor'] # Variable objetivo (valor del mercado del jugador)
+
+## 4.1.1 Árbol de Decisión
+# Configuración del modelo de Árbol de Decisión
+X = df[['jugador', 'valor', 'posición', 'posición auxiliar']]  # Variables predictoras
 y = df['valor']  # Variable objetivo (valor del mercado del jugador)
 
 # Dividir el conjunto de datos entre entrenamiento y prueba

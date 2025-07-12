@@ -18,6 +18,78 @@ file_url = 'https://raw.githubusercontent.com/Gabriel2564/TF/b0e20aca29299e25742
 # Cargar el dataset desde la URL
 df = pd.read_excel(file_url)
 
+# Si el dataset es muy grande, tomar una muestra aleatoria (10%)
+df = df.sample(frac=0.1, random_state=42)
+
+# Mostrar las primeras filas del archivo
+st.write("Vista previa de los datos:")
+st.write(df.head())
+
+# 4.1 Modelización
+
+## 4.1.1 Árbol de Decisión
+# Configuración del modelo de Árbol de Decisión
+X = df[['goles', 'asistencias', 'edad', 'altura', 'rating', 'posición auxiliar']]  # Variables predictoras
+y = df['valor']  # Variable objetivo (valor del mercado del jugador)
+
+# Dividir el conjunto de datos entre entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Crear y entrenar el modelo de Árbol de Decisión con profundidad limitada
+dt_model = DecisionTreeClassifier(max_depth=5, random_state=42)  # Limitar la profundidad para optimizar el uso de memoria
+dt_model.fit(X_train, y_train)
+
+# Realizar predicciones y evaluar el modelo
+y_pred_dt = dt_model.predict(X_test)
+st.write(f"Accuracy del Árbol de Decisión: {accuracy_score(y_test, y_pred_dt):.2f}")
+st.write(classification_report(y_test, y_pred_dt))
+
+# Matriz de confusión del Árbol de Decisión
+st.write("Matriz de Confusión (Árbol de Decisión):")
+st.write(confusion_matrix(y_test, y_pred_dt))
+
+## 4.1.2 Random Forest
+# Crear y entrenar el modelo de Random Forest con menos árboles para optimizar memoria
+rf_model = RandomForestClassifier(n_estimators=50, random_state=42)  # Reducir número de árboles
+rf_model.fit(X_train, y_train)
+
+# Realizar predicciones y evaluar el modelo
+y_pred_rf = rf_model.predict(X_test)
+st.write(f"Accuracy del Random Forest: {accuracy_score(y_test, y_pred_rf):.2f}")
+st.write(classification_report(y_test, y_pred_rf))
+
+# Matriz de confusión del Random Forest
+st.write("Matriz de Confusión (Random Forest):")
+st.write(confusion_matrix(y_test, y_pred_rf))
+
+# 4.2 Optimización
+
+## Selección de características usando Random Forest
+# Usar el modelo Random Forest para seleccionar las características más importantes
+sfm = SelectFromModel(rf_model, threshold=0.1)  # Establecer el umbral
+sfm.fit(X_train, y_train)
+
+# Ver qué características se seleccionaron
+selected_features = X.columns[sfm.get_support()]
+st.write(f"Características seleccionadas por Random Forest: {selected_features}")
+
+# Transformar el conjunto de datos para mantener solo las características seleccionadas
+X_train_selected = sfm.transform(X_train)
+X_test_selected = sfm.transform(X_test)
+
+# Re-entrenar el modelo de Random Forest con las características seleccionadas
+rf_model_selected = RandomForestClassifier(n_estimators=50, random_state=42)  # Reducir el número de árboles
+rf_model_selected.fit(X_train_selected, y_train)
+
+# Evaluar el modelo con características seleccionadas
+y_pred_selected = rf_model_selected.predict(X_test_selected)
+st.write(f"Accuracy del Random Forest con características seleccionadas: {accuracy_score(y_test, y_pred_selected):.2f}")
+st.write(classification_report(y_test, y_pred_selected))
+
+# Matriz de confusión con las características seleccionadas
+st.write("Matriz de Confusión (Random Forest con características seleccionadas):")
+st.write(confusion_matrix(y_test, y_pred_selected))
+
 # Comparación de jugadores (Función de recomendación)
 st.write("Comparar dos jugadores:")
 player1_index = st.number_input('Ingrese el índice del primer jugador', min_value=0, max_value=len(df)-1)
@@ -83,68 +155,3 @@ def compare_players(player1_index, player2_index, dataframe):
 if player1_index is not None and player2_index is not None:
     result = compare_players(player1_index, player2_index, df)
     st.write(result)
-
-# 4.1 Modelización
-
-## 4.1.1 Árbol de Decisión
-# Configuración del modelo de Árbol de Decisión
-X = df[['goles', 'asistencias', 'edad', 'altura', 'rating', 'posición auxiliar']]  # Variables predictoras
-y = df['valor']  # Variable objetivo (valor del mercado del jugador)
-
-# Dividir el conjunto de datos entre entrenamiento y prueba
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Crear y entrenar el modelo de Árbol de Decisión
-dt_model = DecisionTreeClassifier(max_depth=3, random_state=42)
-dt_model.fit(X_train, y_train)
-
-# Realizar predicciones y evaluar el modelo
-y_pred_dt = dt_model.predict(X_test)
-st.write(f"Accuracy del Árbol de Decisión: {accuracy_score(y_test, y_pred_dt):.2f}")
-st.write(classification_report(y_test, y_pred_dt))
-
-# Matriz de confusión del Árbol de Decisión
-st.write("Matriz de Confusión (Árbol de Decisión):")
-st.write(confusion_matrix(y_test, y_pred_dt))
-
-## 4.1.2 Random Forest
-# Crear y entrenar el modelo de Random Forest
-rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
-rf_model.fit(X_train, y_train)
-
-# Realizar predicciones y evaluar el modelo
-y_pred_rf = rf_model.predict(X_test)
-st.write(f"Accuracy del Random Forest: {accuracy_score(y_test, y_pred_rf):.2f}")
-st.write(classification_report(y_test, y_pred_rf))
-
-# Matriz de confusión del Random Forest
-st.write("Matriz de Confusión (Random Forest):")
-st.write(confusion_matrix(y_test, y_pred_rf))
-
-# 4.2 Optimización
-
-## Selección de características usando Random Forest
-# Usar el modelo Random Forest para seleccionar las características más importantes
-sfm = SelectFromModel(rf_model, threshold=0.1)  # Establecer el umbral
-sfm.fit(X_train, y_train)
-
-# Ver qué características se seleccionaron
-selected_features = X.columns[sfm.get_support()]
-st.write(f"Características seleccionadas por Random Forest: {selected_features}")
-
-# Transformar el conjunto de datos para mantener solo las características seleccionadas
-X_train_selected = sfm.transform(X_train)
-X_test_selected = sfm.transform(X_test)
-
-# Re-entrenar el modelo de Random Forest con las características seleccionadas
-rf_model_selected = RandomForestClassifier(n_estimators=100, random_state=42)
-rf_model_selected.fit(X_train_selected, y_train)
-
-# Evaluar el modelo con características seleccionadas
-y_pred_selected = rf_model_selected.predict(X_test_selected)
-st.write(f"Accuracy del Random Forest con características seleccionadas: {accuracy_score(y_test, y_pred_selected):.2f}")
-st.write(classification_report(y_test, y_pred_selected))
-
-# Matriz de confusión con las características seleccionadas
-st.write("Matriz de Confusión (Random Forest con características seleccionadas):")
-st.write(confusion_matrix(y_test, y_pred_selected))

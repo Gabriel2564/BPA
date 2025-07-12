@@ -95,22 +95,22 @@ st.write(confusion_matrix(y_test, y_pred_selected))
 
 # Comparación de jugadores (Función de recomendación)
 st.write("Comparar dos jugadores:")
+player1_index = st.number_input('Ingrese el índice del primer jugador', min_value=0, max_value=len(df)-1)
+player2_index = st.number_input('Ingrese el índice del segundo jugador', min_value=0, max_value=len(df)-1)
 
-# Cambié la entrada a nombre del jugador
-player1_name = st.text_input('Ingrese el nombre del primer jugador')
-player2_name = st.text_input('Ingrese el nombre del segundo jugador')
-
-def compare_players(player1_name, player2_name, dataframe):
-    # Buscar los jugadores por nombre
-    player1_features = dataframe[dataframe['jugador'] == player1_name]
-    player2_features = dataframe[dataframe['jugador'] == player2_name]
+def compare_players(player1_index, player2_index, dataframe):
+    player1_features = dataframe.loc[player1_index]
+    player2_features = dataframe.loc[player2_index]
     
-    # Verificar si ambos jugadores existen
-    if player1_features.empty or player2_features.empty:
-        return "Uno o ambos jugadores no se encuentran en el conjunto de datos."
+    # Extraer los nombres de los jugadores
+    player1_name = player1_features['jugador']  # Asume que la columna de nombres se llama 'jugador'
+    player2_name = player2_features['jugador']  # Asume que la columna de nombres se llama 'jugador'
     
-    player1_features = player1_features.iloc[0]
-    player2_features = player2_features.iloc[0]
+    # Mostrar las características de los jugadores seleccionados
+    st.write(f"Características del Jugador 1 ({player1_name} - Índice: {player1_index}):")
+    st.write(player1_features)
+    st.write(f"Características del Jugador 2 ({player2_name} - Índice: {player2_index}):")
+    st.write(player2_features)
     
     score1 = 0
     score2 = 0
@@ -155,6 +155,6 @@ def compare_players(player1_name, player2_name, dataframe):
     else:
         return f"Los jugadores {player1_name} y {player2_name} son comparables."
 
-if player1_name and player2_name:
-    result = compare_players(player1_name, player2_name, df)
+if player1_index is not None and player2_index is not None:
+    result = compare_players(player1_index, player2_index, df)
     st.write(result)

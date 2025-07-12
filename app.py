@@ -13,7 +13,7 @@ from sklearn.feature_selection import SelectFromModel
 st.title('Análisis de Jugadores de Fútbol')
 
 # URL del archivo en GitHub (URL raw del archivo Excel)
-file_url = 'https://raw.githubusercontent.com/Gabriel2564/TF/b0e20aca29299e25742f16d42966c1386e325b5f/DataSet_Jugadores_Categorizado-bpa.xlsx'
+file_url = 'https://raw.githubusercontent.com/Gabriel2564/BPA/main/DataSet_Jugadores_Categorizado-bpa.xlsx'
 
 # Cargar el dataset desde la URL
 df = pd.read_excel(file_url)

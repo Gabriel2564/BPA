@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectFromModel
 
 # Título de la aplicación
@@ -33,11 +34,14 @@ st.write(df.head())
 ## 4.1.1 Árbol de Decisión
 # Configuración del modelo de Árbol de Decisión
 X = df[['goles', 'asistencias', 'edad', 'altura', 'rating', 'posición auxiliar']]  # Variables predictoras
-y = df['valor'] # Variable objetivo (valor del mercado del jugador)
+y = df['valor']  # Variable objetivo (valor del mercado del jugador)
 
+# Escalar los datos para mejorar el rendimiento del modelo
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
 # Dividir el conjunto de datos entre entrenamiento y prueba
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
 # Crear y entrenar el modelo de Árbol de Decisión con profundidad limitada
 dt_model = DecisionTreeClassifier(max_depth=5, random_state=42)  # Limitar la profundidad para optimizar el uso de memoria
